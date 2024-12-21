@@ -1,3 +1,5 @@
+package features;
+
 import com.github.javafaker.Faker;
 import io.restassured.http.ContentType;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -23,7 +25,7 @@ public class ApiTest {
 
 
     @Test
-    public void createLeadPartner() {
+    public void createLeadPartnerTest() {
 
         Actor sam = Actor.named("Sam the supervisor")
                 .whoCan(CallAnApi.at("https://testdg.vpbank.com.vn"));
