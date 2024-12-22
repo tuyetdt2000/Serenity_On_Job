@@ -7,18 +7,18 @@ import net.serenitybdd.screenplay.rest.interactions.Post;
 
 import java.util.Map;
 
-import static endpoints.APIEndpoints.CREATE_LEAD;
+import static endpoints.APIEndpoints.CREATE_DOC;
 
-public class CreateLeadPartner {
-    public static Performable withLeadBody(Map<String, Object> leadBody) {
-        return Task.where("{0} create lead partner", actor ->
+public class CreateDocPartner {
+    public static Performable withCreateDocBody(Map<String, Object> docBody) {
+        return Task.where("{0} create doc", actor ->
         {
             actor.attemptsTo(
-                    Post.to(CREATE_LEAD).with(
+                    Post.to(CREATE_DOC).with(
                             request -> {
                                 request.contentType(ContentType.JSON);
                                 request.header("x-api-key", "ZmRmNzRiNjgtMmVmZC00MGM4LWE3ZTYtNTFkYzhjMDVjNWUw");
-                                request.body(leadBody);
+                                request.body(docBody);
                                 request.then().log().status();
                                 request.then().log().body();
                                 request.that().log().body();
@@ -26,7 +26,6 @@ public class CreateLeadPartner {
                             }
                     )
             );
-
         });
     }
 }

@@ -91,4 +91,45 @@ public class Lead {
         return data;
     }
 
+    public static Map<String, Object> updateLead(String app_id, String phoneNumber) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        // Create and populate the doc_urls list
+        List<Map<String, String>> docUrls = new ArrayList<>();
+
+        // Add each document to the list
+        Map<String, String> doc1 = new HashMap<>();
+        doc1.put("url", "https://tpc.com/cmndmt.jpg");
+        doc1.put("type", "CMND_MT");
+        docUrls.add(doc1);
+
+        Map<String, String> doc2 = new HashMap<>();
+        doc2.put("url", "https://tpc.com/cmndms.jpg");
+        doc2.put("type", "CMND_MS");
+        docUrls.add(doc2);
+
+        Map<String, String> doc3 = new HashMap<>();
+        doc3.put("url", "https://tpc.com/liveness_frontal.jpg");
+        doc3.put("type", "LIVENESS_FRONTAL");
+        docUrls.add(doc3);
+
+        // Add doc_urls to the main HashMap
+        data.put("doc_urls", docUrls);
+
+        // Add other key-value pairs
+        data.put("app_id", app_id);
+        data.put("security_question", "QUESTION2");
+        data.put("card_type", "JCC");
+        data.put("reference1_mobile_phone_number", phoneNumber);
+        data.put("reference1_relationship", "C");
+        data.put("card_delivery_address", "CUADDR");
+        data.put("security_answer", "Tiểu học Chu Phan");
+        data.put("partner_code", "senid_pfm_ttk2");
+        data.put("fatca", "N");
+        data.put("reference1_fullname", "phạm thị thảo");
+        data.put("request_id", "123456");
+        return data;
+    }
+
 }

@@ -14,6 +14,8 @@ import tasks.CreateLeadPartner;
 
 import java.util.Locale;
 
+import static endpoints.APIEndpoints.BASE_URL;
+
 
 @ExtendWith(SerenityJUnit5Extension.class)
 public class CreateLeadPartnerStory {
@@ -22,7 +24,7 @@ public class CreateLeadPartnerStory {
     @BeforeEach
     public void setUp(){
         tuyet = Actor.named("tuyet")
-                .whoCan(CallAnApi.at("https://testdg.vpbank.com.vn"));
+                .whoCan(CallAnApi.at(BASE_URL));
     }
     @Test
     public void createLeadPartner() {
