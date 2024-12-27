@@ -1,10 +1,10 @@
 package features;
 
-import com.github.javafaker.Faker;
+
 import models.Lead;
-import models.LeadResponse;
+
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import net.serenitybdd.rest.SerenityRest;
+
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.ensure.Ensure;
 import net.serenitybdd.screenplay.rest.abilities.CallAnApi;
@@ -15,7 +15,6 @@ import questions.BodyResponse;
 import tasks.CreateLeadPartner;
 import tasks.CreateDocPartner;
 
-import java.util.Locale;
 
 import static endpoints.APIEndpoints.BASE_URL;
 import static features.CreateLeadPartnerStory.randomPhoneNumber;
