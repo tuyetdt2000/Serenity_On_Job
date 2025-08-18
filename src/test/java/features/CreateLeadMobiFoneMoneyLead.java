@@ -1,17 +1,21 @@
 package features;
 
 import com.github.javafaker.Faker;
-import models.InitLeadRequest;
+import models.*;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.ensure.Ensure;
 import net.serenitybdd.screenplay.rest.abilities.CallAnApi;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import questions.BodyResponse;
 import tasks.InitLead;
+import tasks.MariaDBUtils;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Locale;
 
 
@@ -25,20 +29,58 @@ public class CreateLeadMobiFoneMoneyLead {
                 .whoCan(CallAnApi.at("https://edp-gateway-server-uat.mobifi.vn"));
     }
 
+
     // ----------- SUCCESS CASE -----------
     @Test
     public void ValidData_ShouldSuccess() {
+        String randomPhone = randomPhoneNumber();
         InitLeadRequest request = new InitLeadRequest.Builder(
-                "REQ123", "SenID", "MDS", randomPhoneNumber()
+                randomPhone, "SenID", "MDS", randomPhone
         )
-                .programCode("")
-                .fullName("Tên khách hàng")
-                .email("")
-                .gender("")
-                .marriageStatus("")
+                .programCode(null)
+                .fullName("Đoàn Thị Tuyết")
+                .email("tuyetdt@gmail.com")
+                .gender("F")
+                .marriageStatus("SINGLE")
+                .personalIdNo("001300031106")
+                .issueDate("19/03/2025")
+                .issuePlace("Bộ Công An")
+                .oldPersonalIdNo("123456789")
+                .hometownAddress(new HometownAddress(
+                        "68/68 LÊ VĂN SỸ",
+                        "phuong 13",
+                        "quan phu Nhuan",
+                        "Ho Chi Minh"
+                ))
+                .residenceAddress(new ResidenceAddress(
+                        "68/68 LÊ VĂN SỸ",
+                        "phuong 13",
+                        "quan phu Nhuan",
+                        "Ho Chi Minh"
+                ))
+                .ipAddress("171.252.41.37")
+                .device(new Device(
+                        "abc",
+                        "Vietnam",
+                        "Hanoi",
+                        "Desktop",
+                        "Windows 10",
+                        "Chrome"
+                ))
+                .employerStatus("EMPL1")
+                .jobPosition("POSH4")
+                .employerName("CÔNG TY CP TẬP ĐOÀN ĐỨC HẠNH MARPHAVET")
+                .employerAddress(new EmployerAddress(
+                        "68/68 LÊ VĂN SỸ",
+                        "phuong 13",
+                        "quan phu Nhuan",
+                        "Ho Chi Minh"
+                ))
+                .incomeAmount("15500000")
                 .build();
 
         tuyet.attemptsTo(
+
                 InitLead.with(request),
                 Ensure.that(BodyResponse.bodyResponse("status").asBoolean()).isTrue(),
                 Ensure.that(BodyResponse.bodyResponse("message").asString()).isEqualTo("success"),
@@ -46,6 +88,7 @@ public class CreateLeadMobiFoneMoneyLead {
                 Ensure.that(BodyResponse.bodyResponse("data.contractCode").asString()).contains("PASO_"),
                 Ensure.that(BodyResponse.bodyResponse("data.url").asString()).isNotEmpty()
         );
+        System.out.println(randomPhone);
     }
 
     // ----------- requestId -----------
@@ -304,24 +347,50 @@ public class CreateLeadMobiFoneMoneyLead {
 
     // ----------- Logic duplicate lead -----------
     @Test
-    public void Duplicate_InternalTrue_AppStatusMTT0032_LeadSourceIsTrue_ShouldReturnError() {
+    public void Duplicate_InternalTrue_AppStatusMTT0032_LeadSourceIsTrue_InitMexAndCamTheSame_ShouldReturnSuccess() throws SQLException {
+        String phone="0359108030";
+
         InitLeadRequest request = new InitLeadRequest.Builder(
                 generateLongString(10),
                 "SenID",
                 "MDS",
-                "0359108399"
+                phone
+        ).build();
+
+        tuyet.attemptsTo(
+                InitLead.with(request),
+                Ensure.that(BodyResponse.bodyResponse("status").asBoolean()).isTrue(),
+                Ensure.that(BodyResponse.bodyResponse("message").asString()).isEqualTo("success"),
+                Ensure.that(BodyResponse.bodyResponse("httpCode").asInteger()).isEqualTo(200),
+                Ensure.that(BodyResponse.bodyResponse("data.contractCode").asString()).contains("PASO_1755529793406"),
+                Ensure.that(BodyResponse.bodyResponse("data.url").asString()).isNotEmpty()
+        );
+    }
+    @Test
+    public void Duplicate_InternalTrue_AppStatusMTT0032_LeadSourceIsTrue_InitMexAndCamNotTheSame_ShouldReturnError() throws SQLException {
+        String phone="0359108031";
+
+        // Update trước khi gọi API (ví dụ xóa hoặc chỉnh trạng thái)
+        MariaDBUtils.executeUpdate(
+                "UPDATE cus_contract_addition SET modified_time = NOW() WHERE cus_contract_id='16859'"
+        );
+        InitLeadRequest request = new InitLeadRequest.Builder(
+                generateLongString(10),
+                "SenID",
+                "MDS",
+                phone
         ).build();
 
         tuyet.attemptsTo(
                 InitLead.with(request),
                 Ensure.that(BodyResponse.bodyResponse("status").asBoolean()).isFalse(),
-                Ensure.that(BodyResponse.bodyResponse("message").asString()).contains("#280230 Phone exists"),
+                Ensure.that(BodyResponse.bodyResponse("message").asString()).contains("#280230 Phone is exists"),
                 Ensure.that(BodyResponse.bodyResponse("httpCode").asInteger()).isEqualTo(400),
                 Ensure.that(BodyResponse.bodyResponse("errorCode").asString()).isEqualTo("280230")
         );
     }
     @Test
-    public void Duplicate_InternalTrue_AppStatusMTT0032_LeadSourceIsFalse_ShouldReturnError() {
+    public void Duplicate_InternalTrue_AppStatusMTT0032_LeadSourceIsFalse_ShouldReturnSuccess() {
         InitLeadRequest request = new InitLeadRequest.Builder(
                 generateLongString(10),
                 "SenID",
@@ -407,20 +476,29 @@ public class CreateLeadMobiFoneMoneyLead {
         );
     }
     @Test
-    public void Duplicate_InternalTrue_AppStatusMTT0036_ShouldReturnError() {
+    public void Duplicate_InternalTrue_AppStatusMTT0036_ShouldReturnSuccess() throws SQLException {
+        String phone="0389897879";
+
+        // Update trước khi gọi API (ví dụ xóa hoặc chỉnh trạng thái)
+        MariaDBUtils.executeUpdate(
+                String.format("UPDATE cus_contract SET modified_time = NOW(), status='MTT0036' " +
+                        " WHERE tel_phone_number='%s'",phone)
+
+        );
         InitLeadRequest request = new InitLeadRequest.Builder(
                 generateLongString(10),
                 "SenID",
                 "MDS",
-                "0389897879"
+                phone
         ).build();
 
         tuyet.attemptsTo(
                 InitLead.with(request),
-                Ensure.that(BodyResponse.bodyResponse("status").asBoolean()).isFalse(),
-                Ensure.that(BodyResponse.bodyResponse("message").asString()).contains("#280230 Phone exists"),
-                Ensure.that(BodyResponse.bodyResponse("httpCode").asInteger()).isEqualTo(400),
-                Ensure.that(BodyResponse.bodyResponse("errorCode").asString()).isEqualTo("280230")
+                Ensure.that(BodyResponse.bodyResponse("status").asBoolean()).isTrue(),
+                Ensure.that(BodyResponse.bodyResponse("message").asString()).isEqualTo("success"),
+                Ensure.that(BodyResponse.bodyResponse("httpCode").asInteger()).isEqualTo(200),
+                Ensure.that(BodyResponse.bodyResponse("data.contractCode").asString()).contains("PASO_"),
+                Ensure.that(BodyResponse.bodyResponse("data.url").asString()).isNotEmpty()
         );
     }
     @Test
@@ -441,7 +519,7 @@ public class CreateLeadMobiFoneMoneyLead {
         );
     }
     @Test
-    public void Duplicate_InternalFalse_BankNotIsExists_ShouldReturnError() {
+    public void Duplicate_InternalFalse_BankNotIsExists_ShouldReturnSuccess() {
         InitLeadRequest request = new InitLeadRequest.Builder(
                 generateLongString(10),
                 "SenID",
@@ -451,10 +529,11 @@ public class CreateLeadMobiFoneMoneyLead {
 
         tuyet.attemptsTo(
                 InitLead.with(request),
-                Ensure.that(BodyResponse.bodyResponse("status").asBoolean()).isFalse(),
-                Ensure.that(BodyResponse.bodyResponse("message").asString()).contains("#280230 Phone exists"),
-                Ensure.that(BodyResponse.bodyResponse("httpCode").asInteger()).isEqualTo(400),
-                Ensure.that(BodyResponse.bodyResponse("errorCode").asString()).isEqualTo("280230")
+                Ensure.that(BodyResponse.bodyResponse("status").asBoolean()).isTrue(),
+                Ensure.that(BodyResponse.bodyResponse("message").asString()).isEqualTo("success"),
+                Ensure.that(BodyResponse.bodyResponse("httpCode").asInteger()).isEqualTo(200),
+                Ensure.that(BodyResponse.bodyResponse("data.contractCode").asString()).contains("PASO_"),
+                Ensure.that(BodyResponse.bodyResponse("data.url").asString()).isNotEmpty()
         );
     }
 

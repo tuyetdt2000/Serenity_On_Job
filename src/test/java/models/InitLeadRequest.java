@@ -1,6 +1,5 @@
 package models;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,15 +22,15 @@ public class InitLeadRequest {
     private String personalIdNo;
     private String issueDate;
     private String issuePlace;
-    private String oldpersonalIdNo;
-    private String hometownAddress;
-    private String residenceAddress;
+    private String oldPersonalIdNo;
+    private HometownAddress hometownAddress;
+    private ResidenceAddress residenceAddress;
     private String ipAddress;
-    private String device;
+    private Device device;
     private String employerStatus;
     private String jobPosition;
     private String employerName;
-    private String employerAddress;
+    private EmployerAddress employerAddress;
     private String incomeAmount;
 
     // Private constructor
@@ -49,7 +48,7 @@ public class InitLeadRequest {
         this.personalIdNo = builder.personalIdNo;
         this.issueDate = builder.issueDate;
         this.issuePlace = builder.issuePlace;
-        this.oldpersonalIdNo = builder.oldPersonalIdNo;
+        this.oldPersonalIdNo = builder.oldPersonalIdNo;
         this.hometownAddress = builder.hometownAddress;
         this.residenceAddress = builder.residenceAddress;
         this.ipAddress = builder.ipAddress;
@@ -79,14 +78,14 @@ public class InitLeadRequest {
         private String issueDate;
         private String issuePlace;
         private String oldPersonalIdNo;
-        private String hometownAddress;
-        private String residenceAddress;
+        private HometownAddress hometownAddress;
+        private ResidenceAddress residenceAddress;
         private String ipAddress;
-        private String device;
+        private Device device;
         private String employerStatus;
         private String jobPosition;
         private String employerName;
-        private String employerAddress;
+        private EmployerAddress employerAddress;
         private String incomeAmount;
 
 
@@ -147,12 +146,12 @@ public class InitLeadRequest {
             return this;
         }
 
-        public Builder hometownAddress(String hometownAddress) {
+        public Builder hometownAddress(HometownAddress hometownAddress) {
             this.hometownAddress = hometownAddress;
             return this;
         }
 
-        public Builder residenceAddress(String residenceAddress) {
+        public Builder residenceAddress(ResidenceAddress residenceAddress) {
             this.residenceAddress = residenceAddress;
             return this;
         }
@@ -162,7 +161,7 @@ public class InitLeadRequest {
             return this;
         }
 
-        public Builder device(String device) {
+        public Builder device(Device device) {
             this.device = device;
             return this;
         }
@@ -182,7 +181,7 @@ public class InitLeadRequest {
             return this;
         }
 
-        public Builder employerAddress(String employerAddress) {
+        public Builder employerAddress(EmployerAddress employerAddress) {
             this.employerAddress = employerAddress;
             return this;
         }
